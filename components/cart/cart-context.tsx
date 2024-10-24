@@ -91,7 +91,6 @@ function updateCartTotals(lines: CartItem[]): Pick<Cart, 'totalQuantity' | 'cost
 function createEmptyCart(): Cart {
   return {
     id: undefined,
-    checkoutUrl: '',
     totalQuantity: 0,
     lines: [],
     currency: 'USD',

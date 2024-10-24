@@ -27,7 +27,6 @@ export const reshapeProducts = (products: FourthwallProduct[]) => {
 
   for (const product of products) {
     if (product) {
-      console.warn(JSON.stringify(product));
       const reshapedProduct = reshapeProduct(product);
 
       if (reshapedProduct) {

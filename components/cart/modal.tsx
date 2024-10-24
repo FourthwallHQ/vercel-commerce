@@ -92,7 +92,7 @@ export default function CartModal() {
                         const merchandiseSearchParams = {} as MerchandiseSearchParams;
 
                         item.merchandise.selectedOptions.forEach(({ name, value }) => {
-                          if (value !== DEFAULT_OPTION) {
+                          if (value && value !== DEFAULT_OPTION) {
                             merchandiseSearchParams[name.toLowerCase()] = value;
                           }
                         });
