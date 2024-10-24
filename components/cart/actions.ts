@@ -18,9 +18,7 @@ function setCartId(cartId: string) {
 
 export async function addItem(prevState: any, selectedVariantId: string | undefined) {
   try {
-    console.warn('ADDING', await getCartId());
     const cart = await getCart(await getCartId(), 'USD') || (await createCartAndSetCookie());
-    console.warn('ADDED', cart);
     const cartId = cart.id!!;
 
     if (!cart || !selectedVariantId) {
@@ -117,9 +115,7 @@ export async function redirectToCheckout(currency: string) {
 }
 
 export async function createCartAndSetCookie() {
-  console.warn('CREATING');
   let cart = await createCart();
   setCartId(cart.id!!);
-  console.warn('CREATED', cart);
   return cart;
 }
