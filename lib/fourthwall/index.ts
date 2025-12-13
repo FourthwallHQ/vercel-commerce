@@ -68,10 +68,7 @@ async function fourthwallPost<T>(url: string, data: any, options: RequestInit = 
       body: JSON.stringify(data)
     });
 
-    console.warn('POST', url, data);
-
     const bodyRaw = await result.text();
-    console.warn('POST', bodyRaw);
     const body = JSON.parse(bodyRaw);
 
     return {
@@ -127,6 +124,7 @@ export async function getCollectionProducts({
  * Product operations
  */
 export async function getProduct({ handle, currency } : { handle: string, currency: string }): Promise<Product | undefined> {
+  console.log('getProduct', API_URL, handle, currency);
   const res = await fourthwallGet<FourthwallProduct>(path.join(API_URL, 'products', handle), { currency });
 
   return reshapeProduct(res.body);

@@ -14,9 +14,9 @@ import { Suspense } from 'react';
 export async function generateMetadata({
   params
 }: {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
-  const product = await getProduct({ handle: params.handle, currency: 'USD' });
+  const product = await getProduct({ handle: (await params).handle, currency: 'USD' });
 
   if (!product) return notFound();
 
@@ -49,14 +49,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({ params, searchParams }: { params: { handle: string }, searchParams: { currency?: string } }) {
-  const currency = searchParams.currency || 'USD';
+export default async function ProductPage({ params, searchParams }: { params: Promise<{ handle: string }>, searchParams: Promise<{ currency?: string }> }) {
+  const currency = (await searchParams).currency || 'USD';
   const cartId = await getCartId()
 
   const cart = getCart(cartId, currency)
   
   const product = await getProduct({
-    handle: params.handle,
+    handle: (await params).handle,
     currency,
   });
 
