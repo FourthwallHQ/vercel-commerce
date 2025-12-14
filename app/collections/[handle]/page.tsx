@@ -10,12 +10,12 @@ export default async function CategoryPage({
   params,
   searchParams
 }: {
-  params: { handle: string };
-  searchParams?: { currency?: string };
+  params: Promise<{ handle: string }>;
+  searchParams: Promise<{ currency?: string }>;
 }) {
   const cartId = await getCartId();
-  const currency = searchParams?.currency || 'USD';
-  const products = await getCollectionProducts({ collection: params.handle, currency, limit: 5 });
+  const currency = (await searchParams).currency || 'USD';
+  const products = await getCollectionProducts({ collection: (await params).handle, currency, limit: 5 });
   const cart = getCart(cartId, currency);  
 
   return (

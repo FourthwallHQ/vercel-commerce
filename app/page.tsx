@@ -12,9 +12,9 @@ export const metadata = {
   }
 };
 
-export default async function HomePage({ searchParams }: { searchParams: { currency?: string } }) {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ currency?: string }> }) {
   const cartId = await getCartId();
-  const currency = searchParams.currency || 'USD';
+  const currency = (await searchParams).currency || 'USD';
   // Don't await the fetch, pass the Promise to the context provider
   const cart = getCart(cartId, currency);
 
