@@ -6,7 +6,7 @@ import LoadingDots from 'components/loading-dots';
 import Price from 'components/price';
 import { DEFAULT_OPTION } from 'lib/constants';
 import { createUrl } from 'lib/utils';
-import Image from 'next/image';
+import { ProductImage } from 'components/product-image';
 import Link from 'next/link';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -113,7 +113,7 @@ export default function CartModal() {
                               </div>
                               <div className="flex flex-row">
                                 <div className="relative h-16 w-16 overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
-                                  <Image
+                                  <ProductImage
                                     className="h-full w-full object-cover"
                                     width={64}
                                     height={64}
@@ -122,6 +122,7 @@ export default function CartModal() {
                                       item.merchandise.product.title
                                     }
                                     src={item.merchandise.product.featuredImage.url}
+                                    transformedSrc={item.merchandise.product.featuredImage.transformedUrl}
                                   />
                                 </div>
                                 <Link

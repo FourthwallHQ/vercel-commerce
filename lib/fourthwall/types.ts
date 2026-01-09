@@ -26,6 +26,7 @@ export type FourthwallProduct = {
 export type FourthwallProductImage = {
   id: string;
   url: string;
+  transformedUrl: string;
   width: number;
   height: number;
 };

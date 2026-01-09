@@ -2,9 +2,9 @@
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { GridTileImage } from 'components/grid/tile';
+import { ProductImage } from 'components/product-image';
 import { useProduct, useUpdateURL } from 'components/product/product-context';
 import { Product } from 'lib/types';
-import Image from 'next/image';
 
 export function Gallery({ product }: { product: Product }) {
   const { state, updateImage } = useProduct();
@@ -27,12 +27,13 @@ export function Gallery({ product }: { product: Product }) {
     <form>
       <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden">
         {images[imageIndex] && (
-          <Image
+          <ProductImage
             className="h-full w-full object-contain"
             fill
             sizes="(min-width: 1024px) 66vw, 100vw"
             alt={images[imageIndex]?.altText as string}
             src={images[imageIndex]?.url as string}
+            transformedSrc={images[imageIndex]?.transformedUrl as string}
             priority={true}
           />
         )}
@@ -84,6 +85,7 @@ export function Gallery({ product }: { product: Product }) {
                   <GridTileImage
                     alt={image.altText}
                     src={image.url}
+                    transformedSrc={image.transformedUrl}
                     width={80}
                     height={80}
                     active={isActive}
