@@ -5,6 +5,8 @@ import Footer from 'components/layout/footer';
 import { Wrapper } from 'components/wrapper';
 import { getCart } from 'lib/fourthwall';
 
+export const revalidate = 3600; // 1 hour in seconds
+
 export const metadata = {
   description: 'High-performance ecommerce store built with Next.js, Vercel, and Fourthwall.',
   openGraph: {

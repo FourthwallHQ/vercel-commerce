@@ -8,8 +8,15 @@ import { ProductProvider } from 'components/product/product-context';
 import { ProductDescription } from 'components/product/product-description';
 import { Wrapper } from 'components/wrapper';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
-import { getCart, getProduct } from 'lib/fourthwall';
+import { getCart, getProduct, getProducts } from 'lib/fourthwall';
 import { Suspense } from 'react';
+
+export const revalidate = 3600; // 1 hour in seconds
+
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map(({ handle }) => ({ handle }));
+}
 
 export async function generateMetadata({
   params

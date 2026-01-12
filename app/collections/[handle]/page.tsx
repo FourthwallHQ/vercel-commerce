@@ -4,7 +4,14 @@ import Collections from "components/layout/collections";
 import Footer from "components/layout/footer";
 import ProductGridItems from "components/layout/product-grid-items";
 import { Wrapper } from "components/wrapper";
-import { getCart, getCollectionProducts } from "lib/fourthwall";
+import { getCart, getCollectionProducts, getCollections } from "lib/fourthwall";
+
+export const revalidate = 3600; // 1 hour in seconds
+
+export async function generateStaticParams() {
+  const collections = await getCollections();
+  return collections.map(({ handle }) => ({ handle }));
+}
 
 export default async function CategoryPage({
   params,

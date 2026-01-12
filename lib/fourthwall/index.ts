@@ -1,4 +1,5 @@
 import { Cart, Collection, Product } from "lib/types";
+import { TAGS } from "lib/constants";
 import * as path from 'path';
 import { reshapeCart, reshapeProduct, reshapeProducts } from "./reshape";
 import { FourthwallCart, FourthwallCollection, FourthwallProduct } from "./types";
@@ -88,7 +89,11 @@ async function fourthwallPost<T>(url: string, data: any, options: RequestInit = 
  * Collection operations
  */
 export async function getCollections(): Promise<Collection[]> {
-  const res = await fourthwallGet<{ results: FourthwallCollection[] }>(path.join(API_URL, 'collections'), {});
+  const res = await fourthwallGet<{ results: FourthwallCollection[] }>(
+    path.join(API_URL, 'collections'),
+    {},
+    { next: { tags: [TAGS.collections] } }
+  );
 
   return res.body.results.map((collection) => ({
     handle: collection.slug,
@@ -106,16 +111,16 @@ export async function getCollectionProducts({
   currency: string;
   limit?: number;
 }): Promise<Product[]> {
-  const res = await fourthwallGet<{results: FourthwallProduct[]}>(path.join(API_URL, 'collections', collection, 'products'), {
-    currency,
-    limit
-  });
+  const res = await fourthwallGet<{results: FourthwallProduct[]}>(
+    path.join(API_URL, 'collections', collection, 'products'),
+    { currency, limit },
+    { next: { tags: [TAGS.collections, TAGS.products] } }
+  );
 
   if (!res.body.results) {
     console.warn(`No collection found for \`${collection}\``);
     return [];
   }
-
 
   return reshapeProducts(res.body.results);
 }
@@ -125,9 +130,28 @@ export async function getCollectionProducts({
  */
 export async function getProduct({ handle, currency } : { handle: string, currency: string }): Promise<Product | undefined> {
   console.log('getProduct', API_URL, handle, currency);
-  const res = await fourthwallGet<FourthwallProduct>(path.join(API_URL, 'products', handle), { currency });
+  const res = await fourthwallGet<FourthwallProduct>(
+    path.join(API_URL, 'products', handle),
+    { currency },
+    { next: { tags: [TAGS.products] } }
+  );
 
   return reshapeProduct(res.body);
+}
+
+export async function getProducts(): Promise<{ handle: string }[]> {
+  const collections = await getCollections();
+  const allProducts = new Set<string>();
+
+  for (const collection of collections) {
+    const products = await getCollectionProducts({
+      collection: collection.handle,
+      currency: 'USD'
+    });
+    products.forEach(p => allProducts.add(p.handle));
+  }
+
+  return Array.from(allProducts).map(handle => ({ handle }));
 }
 
 /**
