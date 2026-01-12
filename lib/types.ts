@@ -41,6 +41,7 @@ export type Collection = {
 
 export type Image = {
   url: string;
+  transformedUrl: string;
   altText: string;
   width: number;
   height: number;

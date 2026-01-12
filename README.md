@@ -65,6 +65,14 @@ vercel env add NEXT_PUBLIC_VERCEL_URL
 vercel --prod # Deploys to production
 ```
 
+## Image Optimization
+
+By default, this template uses Vercel's Image Optimization. To use Fourthwall's built-in image optimization instead, set:
+
+```bash
+NEXT_PUBLIC_USE_FW_IMAGE_OPTIMIZATION="true"
+```
+
 ## Resources
 
 * How to get your [collection handle](https://docs.fourthwall.com/storefront/collection).

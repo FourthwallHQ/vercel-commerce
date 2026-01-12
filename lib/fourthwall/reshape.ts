@@ -6,6 +6,7 @@ import { FourthwallCart, FourthwallCartItem, FourthwallMoney, FourthwallProduct,
  */
 const DEFAULT_IMAGE: Image = {
   url: '',
+  transformedUrl: '',
   altText: '',
   width: 0,
   height: 0
@@ -94,7 +95,10 @@ const reshapeImages = (images: FourthwallProductImage[], productTitle: string): 
   return images.map((image) => {
     const filename = image.url.match(/.*\/(.*)\..*/)?.[1];
     return {
-      ...image,
+      url: image.url,
+      transformedUrl: image.transformedUrl,
+      width: image.width,
+      height: image.height,
       altText: `${productTitle} - ${filename}`
     };
   });
@@ -142,6 +146,7 @@ const reshapeCartItem = (item: FourthwallCartItem): CartItem => {
         title: item.variant.product?.name || 'TT',
         featuredImage: {
           url: item.variant.images[0]?.url || 'TT',
+          transformedUrl: item.variant.images[0]?.transformedUrl || 'TT',
           altText: item.variant.product?.name || 'TT',
           width: item.variant.images[0]?.width || 100,
           height: item.variant.images[0]?.height || 100
