@@ -22,7 +22,7 @@ export async function Carousel({currency}: {currency: string}) {
             key={`${product.handle}${i}`}
             className="relative aspect-square h-[30vh] max-h-[275px] w-2/3 max-w-[475px] flex-none md:w-1/3"
           >
-            <Link href={`/product/${product.handle}?currency=${currency}`} className="relative h-full w-full">
+            <Link href={`/${currency}/product/${product.handle}`} className="relative h-full w-full">
               <GridTileImage
                 alt={product.title}
                 label={{

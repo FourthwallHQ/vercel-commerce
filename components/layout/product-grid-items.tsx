@@ -3,14 +3,14 @@ import { GridTileImage } from 'components/grid/tile';
 import { Product } from 'lib/types';
 import Link from 'next/link';
 
-export default function ProductGridItems({ products }: { products: Product[] }) {
+export default function ProductGridItems({ products, currency }: { products: Product[]; currency: string }) {
   return (
     <>
       {products.map((product) => (
         <Grid.Item key={product.handle} className="animate-fadeIn">
           <Link
             className="relative inline-block h-full w-full"
-            href={`/product/${product.handle}`}
+            href={`/${currency}/product/${product.handle}`}
             prefetch={true}
           >
             <GridTileImage

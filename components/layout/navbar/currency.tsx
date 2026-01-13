@@ -15,12 +15,12 @@ export function CurrencySelector({ currency }: { currency: string; }) {
   const selectedCurrency = currency;
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSelect = (currency: string) => {
-    // navigate to the current page with the new currency as query param
-    const newParams = new URLSearchParams(window.location.search);
-    newParams.set('currency', currency);
-    window.history.pushState({}, '', `${window.location.pathname}?${newParams}`);
-    window.location.reload();
+  const handleSelect = (newCurrency: string) => {
+    // Replace currency segment in path (e.g., /USD/product/foo -> /EUR/product/foo)
+    const pathParts = window.location.pathname.split('/');
+    pathParts[1] = newCurrency;
+    const newPath = pathParts.join('/');
+    window.location.href = newPath;
 
     setIsOpen(false);
   }

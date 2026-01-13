@@ -9,6 +9,14 @@ const STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '';
 /**
  * Helpers
  */
+class FourthwallError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function fourthwallGet<T>(
   url: string,
   query: Record<string, string | number | undefined>,
@@ -23,43 +31,36 @@ async function fourthwallGet<T>(
   });
   constructedUrl.searchParams.append('storefront_token', STOREFRONT_TOKEN);
 
-  try {
-    const { next, ...fetchOptions } = options;
-    const result = await fetch(
-      constructedUrl.toString(),
-      {
-        method: 'GET',
-        ...fetchOptions,
-        headers: {
-          'Content-Type': 'application/json',
-          ...fetchOptions.headers
-        },
-        next,
-      }
-    );
-
-    const body = await result.json();
-
-    if (result.status !== 200) {
-      console.error({
-        status: result.status,
-        url: constructedUrl.toString(),
-        body,
-      });
-
-      throw new Error("Failed to fetch from Fourthwall");
+  const { next, ...fetchOptions } = options;
+  const result = await fetch(
+    constructedUrl.toString(),
+    {
+      method: 'GET',
+      ...fetchOptions,
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions.headers
+      },
+      next,
     }
+  );
 
-    return {
+  const body = await result.json();
+
+  if (result.status !== 200) {
+    console.error({
       status: result.status,
+      url: constructedUrl.toString(),
       body,
-    };
-  } catch (e) {
-    throw {
-      error: e,
-      url
-    };
+    });
+
+    throw new FourthwallError("Failed to fetch from Fourthwall", result.status);
   }
+
+  return {
+    status: result.status,
+    body,
+  };
 }
 
 async function fourthwallPost<T>(url: string, data: any, options: RequestInit = {}): Promise<{ status: number; body: T }> {
@@ -135,13 +136,20 @@ export async function getCollectionProducts({
  * Product operations
  */
 export async function getProduct({ handle, currency } : { handle: string, currency: string }): Promise<Product | undefined> {
-  const res = await fourthwallGet<FourthwallProduct>(
-    path.join(API_URL, 'products', handle),
-    { currency },
-    { next: { revalidate: 3600 } }
-  );
+  try {
+    const res = await fourthwallGet<FourthwallProduct>(
+      path.join(API_URL, 'products', handle),
+      { currency },
+      { next: { revalidate: 3600 } }
+    );
 
-  return reshapeProduct(res.body);
+    return reshapeProduct(res.body);
+  } catch (e) {
+    if (e instanceof FourthwallError && e.status === 404) {
+      return undefined;
+    }
+    throw e;
+  }
 }
 
 /**

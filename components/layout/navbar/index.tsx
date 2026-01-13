@@ -12,7 +12,7 @@ export async function Navbar({currency}: {currency: string}) {
       <div className="flex w-full items-center">
         <div className="flex w-full md:w-1/3">
           <Link
-            href="/"
+            href={`/${currency}`}
             prefetch={true}
             className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
           >
@@ -26,7 +26,7 @@ export async function Navbar({currency}: {currency: string}) {
               {collections.map((item) => (
                 <li key={item.title}>
                   <Link
-                    href={`/collections/${item.handle}`}
+                    href={`/${currency}/collections/${item.handle}`}
                     prefetch={true}
                     className="text-neutral-500 underline-offset-4 hover:text-black hover:underline dark:text-neutral-400 dark:hover:text-neutral-300"
                   >
