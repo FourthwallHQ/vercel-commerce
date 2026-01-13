@@ -121,3 +121,11 @@ export async function createCartAndSetCookie() {
   setCartId(cart.id!!);
   return cart;
 }
+
+export async function fetchCart(currency: string = 'USD') {
+  const cartId = await getCartId();
+  if (!cartId) {
+    return undefined;
+  }
+  return getCart(cartId, currency);
+}

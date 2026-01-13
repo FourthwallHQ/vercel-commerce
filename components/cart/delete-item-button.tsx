@@ -4,6 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { removeItem } from 'components/cart/actions';
 import type { CartItem } from 'lib/types';
 import { useActionState } from 'react';
+import { useCart } from './cart-context';
 
 export function DeleteItemButton({
   item,
@@ -12,6 +13,7 @@ export function DeleteItemButton({
   item: CartItem;
   optimisticUpdate: any;
 }) {
+  const { refreshCart } = useCart();
   const [message, formAction] = useActionState(removeItem, null);
   const merchandiseId = item.merchandise.id;
   const actionWithVariant = formAction.bind(null, merchandiseId);
@@ -21,6 +23,7 @@ export function DeleteItemButton({
       action={async () => {
         optimisticUpdate(merchandiseId, 'delete');
         await actionWithVariant();
+        refreshCart();
       }}
     >
       <button

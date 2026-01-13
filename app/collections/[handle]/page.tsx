@@ -1,10 +1,9 @@
-import { getCartId } from "components/cart/actions";
 import Grid from "components/grid";
 import Collections from "components/layout/collections";
 import Footer from "components/layout/footer";
 import ProductGridItems from "components/layout/product-grid-items";
 import { Wrapper } from "components/wrapper";
-import { getCart, getCollectionProducts } from "lib/fourthwall";
+import { getCollectionProducts } from "lib/fourthwall";
 
 export default async function CategoryPage({
   params,
@@ -13,13 +12,11 @@ export default async function CategoryPage({
   params: Promise<{ handle: string }>;
   searchParams: Promise<{ currency?: string }>;
 }) {
-  const cartId = await getCartId();
   const currency = (await searchParams).currency || 'USD';
   const products = await getCollectionProducts({ collection: (await params).handle, currency, limit: 5 });
-  const cart = getCart(cartId, currency);  
 
   return (
-    <Wrapper currency="USD" cart={cart}>
+    <Wrapper currency={currency}>
       <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-4 pb-4 text-black dark:text-white md:flex-row">
         <div className="order-first w-full flex-none md:max-w-[125px]">
           <Collections />

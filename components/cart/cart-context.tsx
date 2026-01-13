@@ -1,7 +1,8 @@
 'use client';
 
 import type { Cart, CartItem, Product, ProductVariant } from 'lib/types';
-import React, { createContext, use, useContext, useMemo, useOptimistic } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useOptimistic, useState } from 'react';
+import { fetchCart } from './actions';
 
 type UpdateType = 'plus' | 'minus' | 'delete';
 
@@ -13,6 +14,7 @@ type CartContextType = {
   cart: Cart | undefined;
   updateCartItem: (merchandiseId: string, updateType: UpdateType) => void;
   addCartItem: (variant: ProductVariant, product: Product) => void;
+  refreshCart: () => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -145,13 +147,22 @@ function cartReducer(state: Cart | undefined, action: CartAction): Cart {
 
 export function CartProvider({
   children,
-  cartPromise,
+  currency = 'USD',
 }: {
   children: React.ReactNode;
-  cartPromise: Promise<Cart | undefined>;
+  currency?: string;
 }) {
-  const initialCart = use(cartPromise);
-  const [optimisticCart, updateOptimisticCart] = useOptimistic(initialCart, cartReducer);
+  const [cart, setCart] = useState<Cart | undefined>(undefined);
+  const [optimisticCart, updateOptimisticCart] = useOptimistic(cart, cartReducer);
+
+  const refreshCart = async () => {
+    const updatedCart = await fetchCart(currency);
+    setCart(updatedCart);
+  };
+
+  useEffect(() => {
+    refreshCart();
+  }, [currency]);
 
   const updateCartItem = (merchandiseId: string, updateType: UpdateType) => {
     updateOptimisticCart({ type: 'UPDATE_ITEM', payload: { merchandiseId, updateType } });
@@ -165,9 +176,10 @@ export function CartProvider({
     () => ({
       cart: optimisticCart,
       updateCartItem,
-      addCartItem
+      addCartItem,
+      refreshCart
     }),
-    [optimisticCart]
+    [optimisticCart, currency]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

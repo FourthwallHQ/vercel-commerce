@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getCartId } from 'components/cart/actions';
 import Footer from 'components/layout/footer';
 import { Gallery } from 'components/product/gallery';
 import { ProductProvider } from 'components/product/product-context';
 import { ProductDescription } from 'components/product/product-description';
 import { Wrapper } from 'components/wrapper';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
-import { getCart, getProduct } from 'lib/fourthwall';
+import { getProduct } from 'lib/fourthwall';
 import { Suspense } from 'react';
 
 export async function generateMetadata({
@@ -51,10 +50,7 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params, searchParams }: { params: Promise<{ handle: string }>, searchParams: Promise<{ currency?: string }> }) {
   const currency = (await searchParams).currency || 'USD';
-  const cartId = await getCartId()
 
-  const cart = getCart(cartId, currency)
-  
   const product = await getProduct({
     handle: (await params).handle,
     currency,
@@ -80,7 +76,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   };
 
   return (
-    <Wrapper currency={currency} cart={cart}>
+    <Wrapper currency={currency}>
       <ProductProvider>
         <script
           type="application/ld+json"
