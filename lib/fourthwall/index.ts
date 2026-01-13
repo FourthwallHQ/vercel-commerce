@@ -121,7 +121,7 @@ export async function getCollectionProducts({
     const res = await fourthwallGet<{results: FourthwallProduct[]}>(
       path.join(API_URL, 'collections', collection, 'products'),
       { currency, limit },
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600, tags: [`collection-${collection}`] } }
     );
 
     if (!res.body.results) {
@@ -144,7 +144,7 @@ export async function getProduct({ handle, currency } : { handle: string, curren
     const res = await fourthwallGet<FourthwallProduct>(
       path.join(API_URL, 'products', handle),
       { currency },
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600, tags: [`product-${handle}`] } }
     );
 
     return reshapeProduct(res.body);
