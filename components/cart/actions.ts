@@ -107,17 +107,25 @@ export async function redirectToCheckout(currency: string) {
     return 'Missing cart ID';
   }
 
-  let cart = await getCart(cartId, 'USD');
+  let cart = await getCart(cartId, currency);
 
   if (!cart) {
     return 'Error fetching cart';
   }
 
-  redirect(`${CHECKOUT_URL}/checkout/?cartId=${cartId}&cartCurrency=USD`);
+  redirect(`${CHECKOUT_URL}/checkout/?cartId=${cartId}&cartCurrency=${currency}`);
 }
 
 export async function createCartAndSetCookie() {
   let cart = await createCart();
   setCartId(cart.id!!);
   return cart;
+}
+
+export async function fetchCart(currency: string = 'USD') {
+  const cartId = await getCartId();
+  if (!cartId) {
+    return undefined;
+  }
+  return getCart(cartId, currency);
 }

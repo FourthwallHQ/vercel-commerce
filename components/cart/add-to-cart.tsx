@@ -59,7 +59,7 @@ function SubmitButton({
 
 export function AddToCart({ product }: { product: Product }) {
   const { variants, availableForSale } = product;
-  const { addCartItem } = useCart();
+  const { addCartItem, refreshCart } = useCart();
   const { state } = useProduct();
   const [message, formAction] = useActionState(addItem, null);
 
@@ -76,6 +76,7 @@ export function AddToCart({ product }: { product: Product }) {
       action={async () => {
         addCartItem(finalVariant, product);
         await actionWithVariant();
+        refreshCart();
       }}
     >
       <SubmitButton availableForSale={availableForSale} selectedVariantId={selectedVariantId} />

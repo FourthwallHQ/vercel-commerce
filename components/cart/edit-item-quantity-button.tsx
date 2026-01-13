@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { updateItemQuantity } from 'components/cart/actions';
 import type { CartItem } from 'lib/types';
 import { useActionState } from 'react';
+import { useCart } from './cart-context';
 
 function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
   return (
@@ -36,6 +37,7 @@ export function EditItemQuantityButton({
   type: 'plus' | 'minus';
   optimisticUpdate: any;
 }) {
+  const { refreshCart } = useCart();
   const [message, formAction] = useActionState(updateItemQuantity, null);
   const payload = {
     merchandiseId: item.merchandise.id,
@@ -48,6 +50,7 @@ export function EditItemQuantityButton({
       action={async () => {
         optimisticUpdate(payload.merchandiseId, type);
         await actionWithVariant();
+        refreshCart();
       }}
     >
       <SubmitButton type={type} />
