@@ -5,6 +5,12 @@ import ProductGridItems from "components/layout/product-grid-items";
 import { Wrapper } from "components/wrapper";
 import { getCollectionProducts } from "lib/fourthwall";
 
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function CategoryPage({
   params,
 }: {

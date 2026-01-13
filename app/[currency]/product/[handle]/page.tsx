@@ -10,6 +10,12 @@ import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
 import { getProduct } from 'lib/fourthwall';
 import { Suspense } from 'react';
 
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params
 }: {
