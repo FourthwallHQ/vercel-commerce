@@ -117,19 +117,23 @@ export async function getCollectionProducts({
   currency: string;
   limit?: number;
 }): Promise<Product[]> {
-  const res = await fourthwallGet<{results: FourthwallProduct[]}>(
-    path.join(API_URL, 'collections', collection, 'products'),
-    { currency, limit },
-    { next: { revalidate: 3600 } }
-  );
+  try {
+    const res = await fourthwallGet<{results: FourthwallProduct[]}>(
+      path.join(API_URL, 'collections', collection, 'products'),
+      { currency, limit },
+      { next: { revalidate: 3600 } }
+    );
 
-  if (!res.body.results) {
-    console.warn(`No collection found for \`${collection}\``);
+    if (!res.body.results) {
+      console.warn(`No collection found for \`${collection}\``);
+      return [];
+    }
+
+    return reshapeProducts(res.body.results);
+  } catch (e) {
+    console.error(`Error fetching collection products for \`${collection}\`:`, e);
     return [];
   }
-
-
-  return reshapeProducts(res.body.results);
 }
 
 /**
