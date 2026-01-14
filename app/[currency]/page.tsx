@@ -2,6 +2,7 @@ import { Carousel } from 'components/carousel';
 import { ThreeItemGrid } from 'components/grid/three-items';
 import Footer from 'components/layout/footer';
 import { Wrapper } from 'components/wrapper';
+import { getShop } from 'lib/fourthwall';
 
 export const metadata = {
   description: 'High-performance ecommerce store built with Next.js, Vercel, and Fourthwall.',
@@ -16,9 +17,10 @@ export function generateStaticParams() {
 
 export default async function HomePage({ params }: { params: Promise<{ currency: string }> }) {
   const currency = (await params).currency;
+  const shop = await getShop();
 
   return (
-    <Wrapper currency={currency}>
+    <Wrapper currency={currency} shop={shop}>
       <ThreeItemGrid currency={currency} />
       <Carousel currency={currency} />
       <Footer />

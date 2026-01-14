@@ -76,3 +76,10 @@ export type FourthwallCartItem = {
 export type FourthwallCheckout = {
   id: string
 };
+
+export type FourthwallShop = {
+  id: string;
+  name: string;
+  domain: string;
+  publicDomain: string;
+};

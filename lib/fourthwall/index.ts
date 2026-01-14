@@ -1,10 +1,9 @@
 import { Cart, Collection, Product } from "lib/types";
-import * as path from 'path';
 import { reshapeCart, reshapeProduct, reshapeProducts } from "./reshape";
-import { FourthwallCart, FourthwallCollection, FourthwallProduct } from "./types";
+import { FourthwallCart, FourthwallCollection, FourthwallProduct, FourthwallShop } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_FW_API_URL || 'https://storefront-api.fourthwall.com/v1';
-const STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '';
+const API_URL = (process.env.NEXT_PUBLIC_FW_API_URL || 'https://storefront-api.fourthwall.com/v1').trim();
+const STOREFRONT_TOKEN = (process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '').trim();
 
 /**
  * Helpers
@@ -45,7 +44,8 @@ async function fourthwallGet<T>(
     }
   );
 
-  const body = await result.json();
+  const bodyRaw = await result.text();
+  const body = JSON.parse(bodyRaw);
 
   if (result.status !== 200) {
     console.error({
@@ -96,7 +96,7 @@ async function fourthwallPost<T>(url: string, data: any, options: RequestInit = 
  */
 export async function getCollections(): Promise<Collection[]> {
   const res = await fourthwallGet<{ results: FourthwallCollection[] }>(
-    path.join(API_URL, 'collections'),
+    `${API_URL}/collections`,
     {},
     { next: { revalidate: 3600 } }
   );
@@ -119,7 +119,7 @@ export async function getCollectionProducts({
 }): Promise<Product[]> {
   try {
     const res = await fourthwallGet<{results: FourthwallProduct[]}>(
-      path.join(API_URL, 'collections', collection, 'products'),
+      `${API_URL}/collections/${collection}/products`,
       { currency, limit },
       { next: { revalidate: 3600, tags: [`collection-${collection}`] } }
     );
@@ -142,7 +142,7 @@ export async function getCollectionProducts({
 export async function getProduct({ handle, currency } : { handle: string, currency: string }): Promise<Product | undefined> {
   try {
     const res = await fourthwallGet<FourthwallProduct>(
-      path.join(API_URL, 'products', handle),
+      `${API_URL}/products/${handle}`,
       { currency },
       { next: { revalidate: 3600, tags: [`product-${handle}`] } }
     );
@@ -165,7 +165,7 @@ export async function getCart(cartId: string | undefined, currency: string): Pro
   }
 
   try {
-    const res = await fourthwallGet<FourthwallCart>(path.join(API_URL, 'carts', cartId), {
+    const res = await fourthwallGet<FourthwallCart>(`${API_URL}/carts/${cartId}`, {
       currency
     }, {
       cache: 'no-store'
@@ -180,7 +180,7 @@ export async function getCart(cartId: string | undefined, currency: string): Pro
 
 export async function createCart(): Promise<Cart> {
   try {
-    const res = await fourthwallPost<FourthwallCart>(path.join(API_URL, 'carts'), {
+    const res = await fourthwallPost<FourthwallCart>(`${API_URL}/carts`, {
       items: []
     });
 
@@ -201,7 +201,7 @@ export async function addToCart(
     quantity: line.quantity
   }));
 
-  const res = await fourthwallPost<FourthwallCart>(path.join(API_URL, 'carts', cartId, 'add'), {
+  const res = await fourthwallPost<FourthwallCart>(`${API_URL}/carts/${cartId}/add`, {
     items,
   }, {
     cache: 'no-store'    
@@ -215,7 +215,7 @@ export async function removeFromCart(cartId: string, lineIds: string[]): Promise
     variantId: id
   }));
 
-  const res = await fourthwallPost<FourthwallCart>(path.join(API_URL, 'carts', cartId, 'remove'), {
+  const res = await fourthwallPost<FourthwallCart>(`${API_URL}/carts/${cartId}/remove`, {
     items,
   }, {
     cache: 'no-store'
@@ -233,11 +233,90 @@ export async function updateCart(
     quantity: line.quantity
   }));
 
-  const res = await fourthwallPost<FourthwallCart>(path.join(API_URL, 'carts', cartId, 'change'), {
+  const res = await fourthwallPost<FourthwallCart>(`${API_URL}/carts/${cartId}/change`, {
     items,
   }, {
     cache: 'no-store'
   });
 
   return reshapeCart(res.body);
+}
+
+/**
+ * Shop operations
+ */
+export async function getShop(): Promise<FourthwallShop> {
+  const res = await fourthwallGet<FourthwallShop>(
+    `${API_URL}/shop`,
+    {},
+    { next: { revalidate: 3600 } }
+  );
+
+  return res.body;
+}
+
+export async function getCheckoutUrl(): Promise<string> {
+  const shop = await getShop();
+
+  if (shop.publicDomain) {
+    return `https://${shop.publicDomain}`;
+  }
+
+  return `https://${shop.domain}.fourthwall.com`;
+}
+
+/**
+ * Analytics configuration
+ */
+type AnalyticsProvider = {
+  provider_name: string;
+  settings: Record<string, string | null>;
+};
+
+type AnalyticsResponse = {
+  providers: AnalyticsProvider[];
+};
+
+export async function getAnalyticsConfig(): Promise<{
+  ga4Id: string;
+  fbPixelId: string;
+  tiktokId: string;
+  klaviyoId: string;
+  useServerAnalytics: boolean;
+}> {
+  const fallback = {
+    ga4Id: '',
+    fbPixelId: '',
+    tiktokId: '',
+    klaviyoId: '',
+    useServerAnalytics: false
+  };
+
+  try {
+    const checkoutUrl = await getCheckoutUrl();
+    const res = await fetch(`${checkoutUrl}/platform/analytics.json`, {
+      next: { revalidate: 3600 }
+    });
+
+    if (!res.ok) {
+      return fallback;
+    }
+
+    const data: AnalyticsResponse = await res.json();
+
+    const getProvider = (name: string) =>
+      data.providers?.find(p => p.provider_name === name);
+
+    const fbCapi = getProvider('facebook_capi');
+
+    return {
+      ga4Id: getProvider('ga4')?.settings?.id || fallback.ga4Id,
+      fbPixelId: fbCapi?.settings?.pixelId || getProvider('facebook')?.settings?.pixelId || fallback.fbPixelId,
+      tiktokId: getProvider('tiktok')?.settings?.id || fallback.tiktokId,
+      klaviyoId: getProvider('klaviyo')?.settings?.publicApiKey || fallback.klaviyoId,
+      useServerAnalytics: fbCapi?.settings?.pixelId ? true : fallback.useServerAnalytics
+    };
+  } catch {
+    return fallback;
+  }
 }
