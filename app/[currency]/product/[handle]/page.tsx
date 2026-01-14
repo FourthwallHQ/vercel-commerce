@@ -8,7 +8,7 @@ import { ProductDescription } from 'components/product/product-description';
 import { ProductViewTracker } from 'components/product/product-view-tracker';
 import { Wrapper } from 'components/wrapper';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
-import { getProduct } from 'lib/fourthwall';
+import { getProduct, getShop } from 'lib/fourthwall';
 import { Suspense } from 'react';
 
 export const revalidate = 3600;
@@ -59,7 +59,10 @@ export async function generateMetadata({
 export default async function ProductPage({ params }: { params: Promise<{ currency: string; handle: string }> }) {
   const { currency, handle } = await params;
 
-  const product = await getProduct({ handle, currency });
+  const [product, shop] = await Promise.all([
+    getProduct({ handle, currency }),
+    getShop()
+  ]);
 
   if (!product) return notFound();
 
@@ -81,8 +84,9 @@ export default async function ProductPage({ params }: { params: Promise<{ curren
   };
 
   return (
-    <Wrapper currency={currency}>
-      <ProductProvider>
+    <Wrapper currency={currency} shop={shop}>
+      <Suspense fallback={null}>
+        <ProductProvider>
         <ProductViewTracker product={product} />
         <script
           type="application/ld+json"
@@ -112,7 +116,8 @@ export default async function ProductPage({ params }: { params: Promise<{ curren
           </div>
         </div>
         <Footer />
-      </ProductProvider>
+        </ProductProvider>
+      </Suspense>
     </Wrapper>
   );
 }

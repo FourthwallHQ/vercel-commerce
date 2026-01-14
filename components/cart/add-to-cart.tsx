@@ -4,6 +4,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { addItem } from 'components/cart/actions';
 import { useProduct } from 'components/product/product-context';
+import { useShop } from 'components/shop/shop-context';
 import { trackAddToCart } from 'lib/analytics';
 import { Product, ProductVariant } from 'lib/types';
 import { useActionState } from 'react';
@@ -62,6 +63,7 @@ export function AddToCart({ product }: { product: Product }) {
   const { variants, availableForSale } = product;
   const { addCartItem, refreshCart } = useCart();
   const { state } = useProduct();
+  const { shop } = useShop();
   const [message, formAction] = useActionState(addItem, null);
 
   const variant = variants.find((variant: ProductVariant) =>
@@ -84,11 +86,13 @@ export function AddToCart({ product }: { product: Product }) {
               item_id: product.id,
               item_name: product.title,
               item_variant: finalVariant.title,
+              item_brand: shop.name,
               price: parseFloat(finalVariant.price.amount),
               quantity: 1,
               currency: finalVariant.price.currencyCode
             }
-          ]
+          ],
+          shopId: shop.id
         });
         await actionWithVariant();
         refreshCart();

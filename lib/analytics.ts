@@ -14,6 +14,7 @@ export interface GA4EcommerceEvent {
   currency: string;
   value: number;
   items: GA4Item[];
+  shopId?: string;
 }
 
 // Declare dataLayer on window object for TypeScript
@@ -28,10 +29,12 @@ export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-PV2BBNN';
 
 /**
  * Push event to dataLayer for GTM
+ * Clears previous ecommerce object before pushing new event
  */
 function pushToDataLayer(event: Record<string, unknown>): void {
   if (typeof window !== 'undefined') {
     window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ ecommerce: null }); // Clear previous ecommerce object
     window.dataLayer.push(event);
   }
 }
@@ -41,13 +44,17 @@ function pushToDataLayer(event: Record<string, unknown>): void {
  * @see https://developers.google.com/analytics/devguides/collection/ga4/reference/events#add_to_cart
  */
 export function trackAddToCart(params: GA4EcommerceEvent): void {
+  const eventId = crypto.randomUUID();
+
   pushToDataLayer({
     event: 'add_to_cart',
     ecommerce: {
       currency: params.currency,
       value: params.value,
       items: params.items
-    }
+    },
+    shopId: params.shopId,
+    eventId
   });
 }
 
@@ -62,7 +69,8 @@ export function trackRemoveFromCart(params: GA4EcommerceEvent): void {
       currency: params.currency,
       value: params.value,
       items: params.items
-    }
+    },
+    shopId: params.shopId
   });
 }
 

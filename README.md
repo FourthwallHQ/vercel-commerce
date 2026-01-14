@@ -139,18 +139,27 @@ curl "https://your-site.com/api/revalidate?path=/EUR/product/my-product&secret=x
 
 ## Analytics
 
-This template supports multiple analytics platforms via environment variables. GTM reads these `window.*` variables to fire the appropriate tracking tags.
+This template supports multiple analytics platforms via GTM. Analytics configuration is **automatically fetched** from your Fourthwall store at:
 
-```bash
-# Analytics IDs (read by GTM)
-NEXT_PUBLIC_GA4_ID=""                    # Google Analytics 4 Measurement ID
-NEXT_PUBLIC_FB_PIXEL_ID=""               # Meta Pixel ID
-NEXT_PUBLIC_TIKTOK_ANALYTICS_ID=""       # TikTok Pixel ID
-NEXT_PUBLIC_KLAVIYO_ID=""                # Klaviyo Public API Key
-NEXT_PUBLIC_USE_SERVER_ANALYTICS="false" # Enable Meta Conversion API tracking (You must have the Conversion API App enabled in your Fourthwall account)
+```
+<NEXT_PUBLIC_FW_CHECKOUT>/platform/analytics.json
 ```
 
-Leave any variable empty or unset to disable that platform. Only platforms with IDs configured will be tracked.
+This means tracking IDs configured in your Fourthwall dashboard are automatically used—no need to duplicate them in environment variables.
+
+### How it works
+
+1. On page load, the app fetches analytics config from your Fourthwall store
+2. The response is cached for 1 hour (ISR)
+3. GTM reads the `window.*` variables to fire the appropriate tracking tags
+
+### Fallback configuration
+
+If the analytics endpoint is unavailable, you can set fallback values via environment variables.
+
+These environment variables are only used if:
+- The fetch to `/platform/analytics.json` fails
+- A specific provider returns `null` in the response
 
 ## Resources
 

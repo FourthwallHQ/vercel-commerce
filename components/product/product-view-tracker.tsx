@@ -1,12 +1,13 @@
 'use client';
 
+import { useShop } from 'components/shop/shop-context';
 import { trackViewItem } from 'lib/analytics';
 import { Product } from 'lib/types';
 import { useEffect } from 'react';
 
-const SHOP_NAME = process.env.NEXT_PUBLIC_SITE_NAME || '';
-
 export function ProductViewTracker({ product }: { product: Product }) {
+  const { shop } = useShop();
+
   useEffect(() => {
     const price = parseFloat(product.priceRange.minVariantPrice.amount);
     const currency = product.priceRange.minVariantPrice.currencyCode;
@@ -18,14 +19,14 @@ export function ProductViewTracker({ product }: { product: Product }) {
         {
           item_id: product.id,
           item_name: product.title,
-          item_brand: SHOP_NAME,
+          item_brand: shop.name,
           price,
           quantity: 1,
           currency
         }
       ]
     });
-  }, [product]);
+  }, [product, shop]);
 
   return null;
 }

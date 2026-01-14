@@ -1,19 +1,19 @@
 'use server';
 
 import { TAGS } from 'lib/constants';
-import { addToCart, createCart, getCart, removeFromCart, updateCart } from 'lib/fourthwall';
+import { addToCart, createCart, getCart, getCheckoutUrl, removeFromCart, updateCart } from 'lib/fourthwall';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function getCartId(): Promise<string | undefined> {
-  const tokenHash = process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN;
+  const tokenHash = (process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '').trim();
   const cookieStore = await cookies();
   return cookieStore.get(`${tokenHash}/cartId`)?.value;
 }
 
 async function setCartId(cartId: string) {
-  const tokenHash = process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN;
+  const tokenHash = (process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '').trim();
   const cookieStore = await cookies();
   cookieStore.set(`${tokenHash}/cartId`, cartId);
 }
@@ -100,7 +100,6 @@ export async function updateItemQuantity(
 }
 
 export async function redirectToCheckout(currency: string) {
-  const CHECKOUT_URL = process.env.NEXT_PUBLIC_FW_CHECKOUT;
   let cartId = await getCartId();
 
   if (!cartId) {
@@ -113,7 +112,8 @@ export async function redirectToCheckout(currency: string) {
     return 'Error fetching cart';
   }
 
-  redirect(`${CHECKOUT_URL}/checkout/?cartId=${cartId}&cartCurrency=${currency}`);
+  const checkoutUrl = await getCheckoutUrl();
+  redirect(`${checkoutUrl}/checkout/?cartId=${cartId}&cartCurrency=${currency}`);
 }
 
 export async function createCartAndSetCookie() {

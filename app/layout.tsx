@@ -1,5 +1,6 @@
 import { GeistSans } from 'geist/font/sans';
 import { GTM_ID } from 'lib/analytics';
+import { getAnalyticsConfig } from 'lib/fourthwall';
 import { ensureStartsWith } from 'lib/utils';
 import Script from 'next/script';
 import { ReactNode } from 'react';
@@ -33,17 +34,19 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  const analytics = await getAnalyticsConfig();
 
   return (
     <html lang="en" className={GeistSans.variable}>
       <head>
         <Script id="analytics-config" strategy="beforeInteractive">
           {`
-            window.creatorGa4Id = '${process.env.NEXT_PUBLIC_GA4_ID || ''}';
-            window.creatorFbPixelId = '${process.env.NEXT_PUBLIC_FB_PIXEL_ID || ''}';
-            window.creatorTiktokAnalyticsId = '${process.env.NEXT_PUBLIC_TIKTOK_ANALYTICS_ID || ''}';
-            window.creatorKlaviyoAnalyticsId = '${process.env.NEXT_PUBLIC_KLAVIYO_ID || ''}';
-            window.useServerAnalytics = ${process.env.NEXT_PUBLIC_USE_SERVER_ANALYTICS === 'true'};
+            window.creatorGa4Id = '${analytics.ga4Id}';
+            window.creatorFbPixelId = '${analytics.fbPixelId}';
+            window.creatorTiktokAnalyticsId = '${analytics.tiktokId}';
+            window.creatorKlaviyoAnalyticsId = '${analytics.klaviyoId}';
+            window.useServerAnalytics = ${analytics.useServerAnalytics};
+            window.cookie_policy = 'ShowInEu';
           `}
         </Script>
         <Script id="gtm" strategy="afterInteractive">
