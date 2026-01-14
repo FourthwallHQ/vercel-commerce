@@ -5,6 +5,7 @@ import Footer from 'components/layout/footer';
 import { Gallery } from 'components/product/gallery';
 import { ProductProvider } from 'components/product/product-context';
 import { ProductDescription } from 'components/product/product-description';
+import { ProductViewTracker } from 'components/product/product-view-tracker';
 import { Wrapper } from 'components/wrapper';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
 import { getProduct } from 'lib/fourthwall';
@@ -82,6 +83,7 @@ export default async function ProductPage({ params }: { params: Promise<{ curren
   return (
     <Wrapper currency={currency}>
       <ProductProvider>
+        <ProductViewTracker product={product} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

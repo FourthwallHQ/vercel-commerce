@@ -4,6 +4,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { addItem } from 'components/cart/actions';
 import { useProduct } from 'components/product/product-context';
+import { trackAddToCart } from 'lib/analytics';
 import { Product, ProductVariant } from 'lib/types';
 import { useActionState } from 'react';
 import { useCart } from './cart-context';
@@ -75,6 +76,20 @@ export function AddToCart({ product }: { product: Product }) {
     <form
       action={async () => {
         addCartItem(finalVariant, product);
+        trackAddToCart({
+          currency: finalVariant.price.currencyCode,
+          value: parseFloat(finalVariant.price.amount),
+          items: [
+            {
+              item_id: product.id,
+              item_name: product.title,
+              item_variant: finalVariant.title,
+              price: parseFloat(finalVariant.price.amount),
+              quantity: 1,
+              currency: finalVariant.price.currencyCode
+            }
+          ]
+        });
         await actionWithVariant();
         refreshCart();
       }}

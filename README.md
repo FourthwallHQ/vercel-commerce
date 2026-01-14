@@ -137,6 +137,21 @@ curl "https://your-site.com/api/revalidate?path=/EUR/product/my-product&secret=x
 { "error": "Missing path or tag parameter" }
 ```
 
+## Analytics
+
+This template supports multiple analytics platforms via environment variables. GTM reads these `window.*` variables to fire the appropriate tracking tags.
+
+```bash
+# Analytics IDs (read by GTM)
+NEXT_PUBLIC_GA4_ID=""                    # Google Analytics 4 Measurement ID
+NEXT_PUBLIC_FB_PIXEL_ID=""               # Meta Pixel ID
+NEXT_PUBLIC_TIKTOK_ANALYTICS_ID=""       # TikTok Pixel ID
+NEXT_PUBLIC_KLAVIYO_ID=""                # Klaviyo Public API Key
+NEXT_PUBLIC_USE_SERVER_ANALYTICS="false" # Enable Meta Conversion API tracking (You must have the Conversion API App enabled in your Fourthwall account)
+```
+
+Leave any variable empty or unset to disable that platform. Only platforms with IDs configured will be tracked.
+
 ## Resources
 
 * How to get your [collection handle](https://docs.fourthwall.com/storefront/collection).

@@ -1,5 +1,7 @@
 import { GeistSans } from 'geist/font/sans';
+import { GTM_ID } from 'lib/analytics';
 import { ensureStartsWith } from 'lib/utils';
+import Script from 'next/script';
 import { ReactNode } from 'react';
 import './globals.css';
 
@@ -34,6 +36,24 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="en" className={GeistSans.variable}>
+      <head>
+        <Script id="analytics-config" strategy="beforeInteractive">
+          {`
+            window.creatorGa4Id = '${process.env.NEXT_PUBLIC_GA4_ID || ''}';
+            window.creatorFbPixelId = '${process.env.NEXT_PUBLIC_FB_PIXEL_ID || ''}';
+            window.creatorTiktokAnalyticsId = '${process.env.NEXT_PUBLIC_TIKTOK_ANALYTICS_ID || ''}';
+            window.creatorKlaviyoAnalyticsId = '${process.env.NEXT_PUBLIC_KLAVIYO_ID || ''}';
+            window.useServerAnalytics = ${process.env.NEXT_PUBLIC_USE_SERVER_ANALYTICS === 'true'};
+          `}
+        </Script>
+        <Script id="gtm" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            '/_c/mtg.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_ID}');`}
+        </Script>
+      </head>
       <body className="bg-neutral-50 text-black selection:bg-teal-300 dark:bg-neutral-900 dark:text-white dark:selection:bg-pink-500 dark:selection:text-white">
         {children}
       </body>
