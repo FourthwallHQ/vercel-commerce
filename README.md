@@ -137,6 +137,49 @@ curl "https://your-site.com/api/revalidate?path=/EUR/product/my-product&secret=x
 { "error": "Missing path or tag parameter" }
 ```
 
+### Fourthwall Webhooks (Automatic)
+
+For automatic cache invalidation when products or collections change in Fourthwall, configure the webhook endpoint.
+
+**Setup:**
+
+1. Set the `FOURTHWALL_WEBHOOK_SECRET` environment variable to a secure random string
+2. In your Fourthwall dashboard, configure a webhook subscription pointing to:
+   ```
+   https://your-site.com/api/webhooks/fourthwall
+   ```
+3. Subscribe to the following events:
+   - `PRODUCT_CREATED`
+   - `PRODUCT_UPDATED`
+   - `COLLECTION_CREATED`
+   - `COLLECTION_UPDATED`
+   - `COLLECTION_DELETED`
+
+**How it works:**
+
+When a product or collection is updated in Fourthwall, a webhook is sent to your endpoint. The endpoint:
+
+1. Verifies the HMAC-SHA256 signature using `FOURTHWALL_WEBHOOK_SECRET`
+2. Extracts the product/collection slug from the payload
+3. Calls `revalidateTag()` with the appropriate tag (`product-{slug}` or `collection-{slug}`)
+
+**Security:**
+
+The webhook endpoint uses HMAC-SHA256 signature verification. Fourthwall signs each webhook payload with your secret, and the endpoint verifies this signature before processing. This prevents unauthorized cache invalidation requests.
+
+**Response examples:**
+
+```json
+// Success
+{ "revalidated": true, "tags": ["product-my-product"], "timestamp": 1705123456789 }
+
+// Invalid signature
+{ "error": "Invalid signature" }
+
+// Missing configuration
+{ "error": "Missing webhook secret configuration" }
+```
+
 ## Analytics
 
 This template supports multiple analytics platforms via GTM. Analytics configuration is **automatically fetched** from your Fourthwall store at:
