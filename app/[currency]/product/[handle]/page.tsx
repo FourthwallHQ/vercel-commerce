@@ -8,7 +8,7 @@ import { ProductDescription } from 'components/product/product-description';
 import { ProductViewTracker } from 'components/product/product-view-tracker';
 import { Wrapper } from 'components/wrapper';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
-import { getProduct, getShop } from 'lib/fourthwall';
+import { getProduct, getShop, getShopOgImage } from 'lib/fourthwall';
 import { Suspense } from 'react';
 
 export const revalidate = 3600;
@@ -23,12 +23,18 @@ export async function generateMetadata({
   params: Promise<{ currency: string; handle: string }>;
 }): Promise<Metadata> {
   const { currency, handle } = await params;
-  const product = await getProduct({ handle, currency });
+  const [product, shopOgImage] = await Promise.all([
+    getProduct({ handle, currency }),
+    getShopOgImage()
+  ]);
 
   if (!product) return notFound();
 
   const { url, width, height, altText: alt } = product.featuredImage || {};
   const indexable = !product.tags.includes(HIDDEN_PRODUCT_TAG);
+
+  // Priority: product featured image, then shop OG image
+  const ogImageUrl = url || shopOgImage;
 
   return {
     title: product.title,
@@ -41,18 +47,20 @@ export async function generateMetadata({
         follow: indexable
       }
     },
-    openGraph: url
+    openGraph: ogImageUrl
       ? {
           images: [
             {
-              url,
-              width,
-              height,
-              alt
+              url: ogImageUrl,
+              ...(url ? { width, height, alt } : {})
             }
           ]
         }
-      : null
+      : undefined,
+    twitter: {
+      card: 'summary_large_image',
+      images: ogImageUrl ? [ogImageUrl] : undefined
+    }
   };
 }
 

@@ -1,6 +1,6 @@
 import { Cart, Collection, Product } from "lib/types";
 import { reshapeCart, reshapeProduct, reshapeProducts } from "./reshape";
-import { FourthwallCart, FourthwallCollection, FourthwallProduct, FourthwallShop } from "./types";
+import { FourthwallCart, FourthwallCollection, FourthwallOgImageResponse, FourthwallProduct, FourthwallShop } from "./types";
 
 const API_URL = (process.env.NEXT_PUBLIC_FW_API_URL || 'https://storefront-api.fourthwall.com/v1').trim();
 const STOREFRONT_TOKEN = (process.env.NEXT_PUBLIC_FW_STOREFRONT_TOKEN || '').trim();
@@ -287,6 +287,25 @@ export async function getStaticPage(handle: string): Promise<StaticPage | null> 
     }
 
     return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * OG Image operations
+ */
+export async function getShopOgImage(): Promise<string | null> {
+  try {
+    const checkoutUrl = await getCheckoutUrl();
+    const res = await fetch(`${checkoutUrl}/platform/api/v1/og-image`, {
+      next: { revalidate: 3600 }
+    });
+
+    if (!res.ok) return null;
+
+    const data: FourthwallOgImageResponse = await res.json();
+    return data.url;
   } catch {
     return null;
   }
