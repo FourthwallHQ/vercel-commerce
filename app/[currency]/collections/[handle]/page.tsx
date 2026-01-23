@@ -18,17 +18,19 @@ export async function generateMetadata({
   params: Promise<{ currency: string; handle: string }>;
 }): Promise<Metadata> {
   const { currency, handle } = await params;
-  const [products, shopOgImage] = await Promise.all([
+  const [products, shopOgImage, shop] = await Promise.all([
     getCollectionProducts({ collection: handle, currency, limit: 1 }),
-    getShopOgImage()
+    getShopOgImage(),
+    getShop()
   ]);
 
   // Priority: first product's featured image, then shop OG image
   const firstProduct = products[0];
   const ogImageUrl = firstProduct?.featuredImage?.url || shopOgImage;
+  const collectionName = handle.charAt(0).toUpperCase() + handle.slice(1);
 
   return {
-    title: handle.charAt(0).toUpperCase() + handle.slice(1),
+    title: `${collectionName} | ${shop.name}`,
     openGraph: ogImageUrl
       ? {
           images: [{ url: ogImageUrl }]

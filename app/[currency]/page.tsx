@@ -10,9 +10,13 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const ogImageUrl = await getShopOgImage();
+  const [ogImageUrl, shop] = await Promise.all([
+    getShopOgImage(),
+    getShop()
+  ]);
 
   return {
+    title: shop.name,
     description: 'High-performance ecommerce store built with Next.js, Vercel, and Fourthwall.',
     openGraph: {
       type: 'website',

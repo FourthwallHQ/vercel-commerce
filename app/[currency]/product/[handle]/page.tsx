@@ -23,9 +23,10 @@ export async function generateMetadata({
   params: Promise<{ currency: string; handle: string }>;
 }): Promise<Metadata> {
   const { currency, handle } = await params;
-  const [product, shopOgImage] = await Promise.all([
+  const [product, shopOgImage, shop] = await Promise.all([
     getProduct({ handle, currency }),
-    getShopOgImage()
+    getShopOgImage(),
+    getShop()
   ]);
 
   if (!product) return notFound();
@@ -37,7 +38,7 @@ export async function generateMetadata({
   const ogImageUrl = url || shopOgImage;
 
   return {
-    title: product.title,
+    title: `${product.title} | ${shop.name}`,
     description: product.description,
     robots: {
       index: indexable,
