@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { Collection } from "lib/types";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 function createUrl(handle: string) {
   return `/collections/${handle}`;
@@ -11,12 +11,8 @@ function createUrl(handle: string) {
 
 function PathFilterItem({ item }: { item: Collection }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const active = pathname === createUrl(item.handle);
-  const newParams = new URLSearchParams(searchParams.toString());
   const DynamicTag = active ? 'p' : Link;
-
-  newParams.delete('q');
 
   return (
     <li className="mt-2 flex text-black dark:text-white" key={item.title}>
