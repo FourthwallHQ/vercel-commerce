@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
   try {
     for (const tag of tags) {
       console.log('[Webhook] Revalidating tag:', tag);
-      revalidateTag(tag, 'default');
+      revalidateTag(tag, 'max');
     }
 
     return NextResponse.json({
