@@ -63,7 +63,7 @@ describe('Fourthwall Webhook Route', () => {
       expect(response.status).toBe(200);
       expect(data.revalidated).toBe(true);
       expect(data.tags).toContain('product-test-product');
-      expect(revalidateTag).toHaveBeenCalledWith('product-test-product', 'default');
+      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-test-product');
     });
   });
 
@@ -84,7 +84,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(401);
       expect(data.error).toBe('Invalid signature');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 
@@ -102,7 +102,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(401);
       expect(data.error).toBe('Invalid signature');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 
@@ -124,7 +124,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(200);
       expect(data.tags).toEqual(['product-awesome-shirt']);
-      expect(revalidateTag).toHaveBeenCalledWith('product-awesome-shirt', 'default');
+      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-awesome-shirt');
     });
 
     it('should invalidate product-{slug} tag for PRODUCT_CREATED', async () => {
@@ -144,7 +144,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(200);
       expect(data.tags).toEqual(['product-new-product']);
-      expect(revalidateTag).toHaveBeenCalledWith('product-new-product', 'default');
+      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-new-product');
     });
   });
 
@@ -166,7 +166,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(200);
       expect(data.tags).toEqual(['collection-summer-collection']);
-      expect(revalidateTag).toHaveBeenCalledWith('collection-summer-collection', 'default');
+      expect(revalidateTag, 'max').toHaveBeenCalledWith('collection-summer-collection');
     });
 
   });
@@ -190,7 +190,7 @@ describe('Fourthwall Webhook Route', () => {
       expect(response.status).toBe(200);
       expect(data.revalidated).toBe(false);
       expect(data.reason).toBe('No tags to invalidate');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 
@@ -212,7 +212,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Missing webhook secret configuration');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 
@@ -235,7 +235,7 @@ describe('Fourthwall Webhook Route', () => {
       expect(response.status).toBe(200);
       expect(data.revalidated).toBe(false);
       expect(data.reason).toBe('No tags to invalidate');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 
@@ -258,7 +258,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Invalid payload');
-      expect(revalidateTag).not.toHaveBeenCalled();
+      expect(revalidateTag, 'max').not.toHaveBeenCalled();
     });
   });
 });
