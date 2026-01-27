@@ -4,7 +4,7 @@ import Collections from "components/layout/collections";
 import Footer from "components/layout/footer";
 import ProductGridItems from "components/layout/product-grid-items";
 import { Wrapper } from "components/wrapper";
-import { getCollectionProducts, getShop, getShopOgImage } from "lib/fourthwall";
+import { getCollectionProducts, getCollections, getShop, getShopOgImage } from "lib/fourthwall";
 
 export const revalidate = 3600;
 
@@ -49,16 +49,17 @@ export default async function CategoryPage({
   params: Promise<{ currency: string; handle: string }>;
 }) {
   const { currency, handle } = await params;
-  const [products, shop] = await Promise.all([
+  const [products, shop, collections] = await Promise.all([
     getCollectionProducts({ collection: handle, currency, limit: 5 }),
-    getShop()
+    getShop(),
+    getCollections()
   ]);
 
   return (
     <Wrapper currency={currency} shop={shop}>
       <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-4 pb-4 text-black dark:text-white md:flex-row">
         <div className="order-first w-full flex-none md:max-w-[125px]">
-          <Collections />
+          <Collections collections={collections} />
         </div>
         <div className="order-last min-h-screen w-full md:order-none">
           <section>
