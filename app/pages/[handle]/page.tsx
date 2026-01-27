@@ -27,7 +27,6 @@ export default async function StaticPage({ params }: { params: Promise<{ handle:
   return (
     <Wrapper currency="USD" shop={shop}>
       <div className="mx-auto max-w-4xl px-4 py-12">
-        <h1 className="mb-8 text-3xl font-bold">{page.title}</h1>
         <Prose html={page.bodyHtml} />
       </div>
       <Footer />

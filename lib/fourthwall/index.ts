@@ -278,7 +278,7 @@ export type StaticPage = {
 export async function getStaticPage(handle: string): Promise<StaticPage | null> {
   try {
     const checkoutUrl = await getCheckoutUrl();
-    const res = await fetch(`${checkoutUrl}/platform/pages/${handle}.json`, {
+    const res = await fetch(`${checkoutUrl}/platform/api/v1/pages/${handle}.json`, {
       next: { revalidate: 3600 }
     });
 
