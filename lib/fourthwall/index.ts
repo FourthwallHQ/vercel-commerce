@@ -266,6 +266,33 @@ export async function getCheckoutUrl(): Promise<string> {
 }
 
 /**
+ * Static pages
+ */
+export type StaticPage = {
+  handle: string;
+  title: string;
+  description: string;
+  bodyHtml: string;
+};
+
+export async function getStaticPage(handle: string): Promise<StaticPage | null> {
+  try {
+    const checkoutUrl = await getCheckoutUrl();
+    const res = await fetch(`${checkoutUrl}/platform/api/v1/pages/${handle}.json`, {
+      next: { revalidate: 3600 }
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Analytics configuration
  */
 type AnalyticsProvider = {
