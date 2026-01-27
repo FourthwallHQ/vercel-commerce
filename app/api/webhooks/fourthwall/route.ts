@@ -6,9 +6,7 @@ import crypto from 'crypto';
 type WebhookEventType =
   | 'PRODUCT_CREATED'
   | 'PRODUCT_UPDATED'
-  | 'COLLECTION_CREATED'
-  | 'COLLECTION_UPDATED'
-  | 'COLLECTION_DELETED';
+  | 'COLLECTION_UPDATED';
 
 interface WebhookPayload {
   type: WebhookEventType;
@@ -55,9 +53,7 @@ function getTagsToInvalidate(payload: WebhookPayload): string[] {
     case 'PRODUCT_UPDATED':
       return [`product-${data.slug}`];
 
-    case 'COLLECTION_CREATED':
     case 'COLLECTION_UPDATED':
-    case 'COLLECTION_DELETED':
       return [`collection-${data.slug}`];
 
     default:

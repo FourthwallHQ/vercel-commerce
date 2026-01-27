@@ -28,7 +28,7 @@ NEXT_PUBLIC_VERCEL_URL="<the url of your vercel site>" # Example: fw-commerce.ve
 
 # Optional
 NEXT_PUBLIC_FW_COLLECTION="<the handle of your collection>" # If you want to display a specific collection. See Resources for more details on how to get the collection handle.
-REVALIDATE_SECRET="<a secure random string>" # Required for on-demand ISR revalidation. See ISR section below.
+FOURTHWALL_WEBHOOK_SECRET="<a secure random string>" # Required for Fourthwall webhook cache invalidation. See ISR section below.
 ```
 
 ## Develop locally
@@ -86,58 +86,7 @@ This template uses ISR to cache pages at the edge for fast load times while keep
 - **Product/Collection pages**: Built on-demand on first request, then cached.
 - **Cart**: Fetched client-side to keep product pages fully static.
 
-### On-demand revalidation
-
-To instantly update content after changes (e.g., product update, price change), use the revalidation endpoint.
-
-**Setup:**
-1. Set the `REVALIDATE_SECRET` environment variable to a secure random string
-2. Configure your CMS or Fourthwall webhook to call this endpoint when content changes
-
-#### Tag-based revalidation (recommended)
-
-Revalidate by tag to invalidate a specific product or collection across all currencies at once:
-
-```
-GET /api/revalidate?tag=product-my-product&secret=YOUR_SECRET
-GET /api/revalidate?tag=collection-all&secret=YOUR_SECRET
-```
-
-**Available tags:**
-- `product-{handle}` - Invalidates cached data for a specific product (all currencies)
-- `collection-{handle}` - Invalidates cached data for a specific collection (all currencies)
-
-This is the recommended approach because a single call invalidates the product/collection data regardless of which currency pages are using it.
-
-#### Path-based revalidation
-
-Alternatively, revalidate a specific page path:
-
-```
-GET /api/revalidate?path=/USD/product/my-product&secret=YOUR_SECRET
-```
-
-**Note:** Path-based revalidation only invalidates that exact page. To revalidate a product for all currencies, you'd need multiple calls:
-```bash
-curl "https://your-site.com/api/revalidate?path=/USD/product/my-product&secret=xxx"
-curl "https://your-site.com/api/revalidate?path=/EUR/product/my-product&secret=xxx"
-```
-
-#### Response examples
-
-```json
-// Success (tag)
-{ "revalidated": true, "tag": "product-my-product", "timestamp": 1705123456789 }
-
-// Success (path)
-{ "revalidated": true, "path": "/USD/product/my-product", "timestamp": 1705123456789 }
-
-// Error
-{ "error": "Invalid secret" }
-{ "error": "Missing path or tag parameter" }
-```
-
-### Fourthwall Webhooks (Automatic)
+### On-demand revalidation via Fourthwall Webhooks
 
 For automatic cache invalidation when products or collections change in Fourthwall, configure the webhook endpoint.
 
@@ -151,9 +100,7 @@ For automatic cache invalidation when products or collections change in Fourthwa
 3. Subscribe to the following events:
    - `PRODUCT_CREATED`
    - `PRODUCT_UPDATED`
-   - `COLLECTION_CREATED`
    - `COLLECTION_UPDATED`
-   - `COLLECTION_DELETED`
 
 **How it works:**
 
