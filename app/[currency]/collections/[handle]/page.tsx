@@ -1,14 +1,46 @@
+import type { Metadata } from "next";
 import Grid from "components/grid";
 import Collections from "components/layout/collections";
 import Footer from "components/layout/footer";
 import ProductGridItems from "components/layout/product-grid-items";
 import { Wrapper } from "components/wrapper";
-import { getCollectionProducts, getShop } from "lib/fourthwall";
+import { getCollectionProducts, getShop, getShopOgImage } from "lib/fourthwall";
 
 export const revalidate = 3600;
 
 export function generateStaticParams() {
   return [];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ currency: string; handle: string }>;
+}): Promise<Metadata> {
+  const { currency, handle } = await params;
+  const [products, shopOgImage, shop] = await Promise.all([
+    getCollectionProducts({ collection: handle, currency, limit: 1 }),
+    getShopOgImage(),
+    getShop()
+  ]);
+
+  // Priority: first product's featured image, then shop OG image
+  const firstProduct = products[0];
+  const ogImageUrl = firstProduct?.featuredImage?.url || shopOgImage;
+  const collectionName = handle.charAt(0).toUpperCase() + handle.slice(1);
+
+  return {
+    title: `${collectionName} | ${shop.name}`,
+    openGraph: ogImageUrl
+      ? {
+          images: [{ url: ogImageUrl }]
+        }
+      : undefined,
+    twitter: {
+      card: 'summary_large_image',
+      images: ogImageUrl ? [ogImageUrl] : undefined
+    }
+  };
 }
 
 export default async function CategoryPage({

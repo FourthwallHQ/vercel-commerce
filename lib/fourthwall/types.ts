@@ -83,3 +83,7 @@ export type FourthwallShop = {
   domain: string;
   publicDomain: string;
 };
+
+export type FourthwallOgImageResponse = {
+  url: string | null;
+};

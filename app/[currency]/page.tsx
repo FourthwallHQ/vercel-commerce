@@ -1,18 +1,32 @@
+import type { Metadata } from 'next';
 import { Carousel } from 'components/carousel';
 import { ThreeItemGrid } from 'components/grid/three-items';
 import Footer from 'components/layout/footer';
 import { Wrapper } from 'components/wrapper';
-import { getShop } from 'lib/fourthwall';
-
-export const metadata = {
-  description: 'High-performance ecommerce store built with Next.js, Vercel, and Fourthwall.',
-  openGraph: {
-    type: 'website'
-  }
-};
+import { getShop, getShopOgImage } from 'lib/fourthwall';
 
 export function generateStaticParams() {
   return [{ currency: 'USD' }, { currency: 'EUR' }, { currency: 'GBP' }, { currency: 'CAD' }];
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [ogImageUrl, shop] = await Promise.all([
+    getShopOgImage(),
+    getShop()
+  ]);
+
+  return {
+    title: shop.name,
+    description: 'High-performance ecommerce store built with Next.js, Vercel, and Fourthwall.',
+    openGraph: {
+      type: 'website',
+      images: ogImageUrl ? [{ url: ogImageUrl }] : undefined
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: ogImageUrl ? [ogImageUrl] : undefined
+    }
+  };
 }
 
 export default async function HomePage({ params }: { params: Promise<{ currency: string }> }) {
