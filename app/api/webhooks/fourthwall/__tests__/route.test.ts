@@ -63,7 +63,9 @@ describe('Fourthwall Webhook Route', () => {
       expect(response.status).toBe(200);
       expect(data.revalidated).toBe(true);
       expect(data.tags).toContain('product-test-product');
-      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-test-product');
+      expect(data.tags).toContain('collection-all');
+      expect(revalidateTag).toHaveBeenCalledWith('product-test-product', 'max');
+      expect(revalidateTag).toHaveBeenCalledWith('collection-all', 'max');
     });
   });
 
@@ -123,8 +125,9 @@ describe('Fourthwall Webhook Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.tags).toEqual(['product-awesome-shirt']);
-      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-awesome-shirt');
+      expect(data.tags).toEqual(['product-awesome-shirt', 'collection-all']);
+      expect(revalidateTag).toHaveBeenCalledWith('product-awesome-shirt', 'max');
+      expect(revalidateTag).toHaveBeenCalledWith('collection-all', 'max');
     });
 
     it('should invalidate product-{slug} tag for PRODUCT_CREATED', async () => {
@@ -143,8 +146,9 @@ describe('Fourthwall Webhook Route', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.tags).toEqual(['product-new-product']);
-      expect(revalidateTag, 'max').toHaveBeenCalledWith('product-new-product');
+      expect(data.tags).toEqual(['product-new-product', 'collection-all']);
+      expect(revalidateTag).toHaveBeenCalledWith('product-new-product', 'max');
+      expect(revalidateTag).toHaveBeenCalledWith('collection-all', 'max');
     });
   });
 
@@ -166,7 +170,7 @@ describe('Fourthwall Webhook Route', () => {
 
       expect(response.status).toBe(200);
       expect(data.tags).toEqual(['collection-summer-collection']);
-      expect(revalidateTag, 'max').toHaveBeenCalledWith('collection-summer-collection');
+      expect(revalidateTag).toHaveBeenCalledWith('collection-summer-collection', 'max');
     });
 
   });
