@@ -51,7 +51,7 @@ function getTagsToInvalidate(payload: WebhookPayload): string[] {
   switch (type) {
     case 'PRODUCT_CREATED':
     case 'PRODUCT_UPDATED':
-      return [`product-${data.slug}`];
+      return [`product-${data.slug}`, 'collection-all'];
 
     case 'COLLECTION_UPDATED':
       return [`collection-${data.slug}`];
