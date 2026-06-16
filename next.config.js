@@ -5,8 +5,15 @@ module.exports = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
-        pathname: '**'
+        hostname: '*.fourthwall.com',
+        port: '',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.fourthwall.dev',
+        port: '',
+        search: '',
       }
     ]
   },
